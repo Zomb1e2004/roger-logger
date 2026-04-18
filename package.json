@@ -1,0 +1,38 @@
+{
+  "name": "roger-logger",
+  "version": "1.0.0",
+  "description": "Logger visual para consola con formato de cuadro decorativo, construido sobre boxen.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "keywords": [
+    "logger",
+    "console",
+    "log",
+    "cli",
+    "terminal",
+    "boxen",
+    "ansi",
+    "colors",
+    "pretty",
+    "debug",
+    "nodejs"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts --tsconfig tsconfig.json",
+    "dev": "tsup src/index.ts --watch"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "boxen": "^8.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.0",
+    "ts-node": "^10.9.2",
+    "tsup": "^8.5.1",
+    "typescript": "^6.0.3"
+  }
+}
