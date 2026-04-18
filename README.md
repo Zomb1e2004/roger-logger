@@ -5,14 +5,11 @@ Logger visual para consola con formato de cuadro decorativo, construido sobre [`
 Genera bloques enmarcados con título, mensaje y datos estructurados, con soporte para colores ANSI y múltiples estilos de borde. Diseñado para mejorar la legibilidad de logs en aplicaciones Node.js, scripts CLI y procesos backend.
 
 ```
-╭──────────── Servidor ────────────╮
+╭────────── Servidor API ──────────╮
 │                                  │
-│   [INFO] Usuarios cargados       │
+│   [INFO] Endpoint de usuarios    │
 │                                  │
-│   [0] {                          │
-│     "name": "Rodrigo",           │
-│     "age": 22                    │
-│   }                              │
+│   URL: https://api.ejemplo.com/v1/users │
 │                                  │
 ╰──────────────────────────────────╯
 ```
@@ -65,6 +62,16 @@ logger.info({
   borderStyle: "double",
   messageColor: "yellow",
 });
+
+// Con una URL
+logger.info({
+  title: "Servidor API",
+  message: "Endpoint de usuarios",
+  url: "https://api.ejemplo.com/v1/users",
+  borderColor: "magenta",
+  borderStyle: "bold",
+  messageColor: "magenta",
+});
 ```
 
 ---
@@ -88,6 +95,7 @@ Imprime un mensaje informativo dentro de un cuadro decorativo.
 | `title`       | `string`              | ✅        | —          | Título del cuadro, centrado en el borde superior.                           |
 | `message`     | `string`              | ✅        | —          | Descripción breve del evento. Aparece con el prefijo `[INFO]`.              |
 | `data`        | `unknown \| unknown[]`| ❌        | —          | Objeto o array de objetos a mostrar debajo del mensaje. Se serializa automáticamente. |
+| `url`         | `string`              | ❌        | —          | Una URL opcional para incluir en el log, mostrada debajo del mensaje y los datos. |
 | `borderColor` | `LoggerColor`         | ❌        | `"cyan"`   | Color del borde del cuadro (encabezado y pie comparten el mismo color).     |
 | `borderStyle` | `LoggerBorderStyle`   | ❌        | `"round"`  | Estilo de borde del cuadro. Ver estilos disponibles abajo.                  |
 | `messageColor`| `LoggerColor`         | ❌        | `"cyan"`   | Color del texto del mensaje.                                                |
