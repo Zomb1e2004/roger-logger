@@ -86,6 +86,15 @@ type LoggerOptions = {
   data?: unknown | unknown[];
 
   /**
+   * Una URL opcional para incluir en el log.
+   *
+   * Se mostrará debajo del mensaje principal y cualquier dato estructurado.
+   *
+   * @example "http://localhost:5134"
+   */
+  url?: string;
+
+  /**
    * Color ANSI aplicado al borde del cuadro (encabezado y pie).
    *
    * Ambos bordes comparten siempre el mismo color para
@@ -287,6 +296,7 @@ export class RogerLogger {
     title,
     message,
     data,
+    url,
     borderColor = "cyan",
     borderStyle = "round",
     messageColor = "cyan",
@@ -296,6 +306,10 @@ export class RogerLogger {
 
     if (data !== undefined) {
       lines.push(`${color}${this.serializeData(data)}${this.reset}`);
+    }
+
+    if (url !== undefined) {
+      lines.push(`${color}URL: ${url}${this.reset}`);
     }
 
     console.log(
