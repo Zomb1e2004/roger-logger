@@ -1,6 +1,6 @@
 {
   "name": "roger-logger",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Logger visual para consola con formato de cuadro decorativo, construido sobre boxen.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
