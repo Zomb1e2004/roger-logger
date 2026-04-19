@@ -1,5 +1,8 @@
 import boxen, { type Options as BoxenOptions } from "boxen";
 
+/**
+ * Colores ANSI soportados para el borde y el texto del log.
+ */
 type LoggerColor =
   | "black"
   | "red"
@@ -10,124 +13,96 @@ type LoggerColor =
   | "cyan"
   | "white";
 
+/**
+ * Estilos de borde disponibles proporcionados por la librería `boxen`.
+ */
 type LoggerBorderStyle = BoxenOptions["borderStyle"];
 
 /**
  * Configuración visual y de contenido para imprimir un mensaje en consola.
  *
  * Define el título del bloque, mensaje principal, datos estructurados opcionales
- * y la apariencia del cuadro renderizado con `boxen`.
+ * y la apariencia del cuadro renderizado.
  *
  * @example
- * // Solo mensaje
+ * // Uso básico
  * const options: LoggerOptions = {
- *   title: "Servidor",
- *   message: "Aplicación iniciada",
+ *   title: "API",
+ *   message: "Usuario creado",
  * };
  *
  * @example
- * // Mensaje con datos estructurados
- * const options: LoggerOptions = {
- *   title: "Servidor",
- *   message: "Usuarios encontrados",
- *   data: [{ name: "Rodrigo", age: 32 }, { name: "Ana", age: 28 }],
- * };
- *
- * @example
- * // Configuración completa con apariencia personalizada
+ * // Con datos y estilo personalizado
  * const options: LoggerOptions = {
  *   title: "Auth",
- *   message: "Token inválido",
- *   borderColor: "red",
+ *   message: "Fallo de login",
+ *   data: { user: "admin", ip: "127.0.0.1" },
  *   borderStyle: "double",
- *   messageColor: "white",
+ *   borderColor: "red"
  * };
  */
 type LoggerOptions = {
   /**
    * Texto mostrado como título del cuadro de log.
    *
-   * Aparece centrado en el borde superior del bloque
-   * renderizado por `boxen`.
+   * Aparece centrado en el borde superior del bloque.
    *
    * @example "Servidor"
-   * @example "Base de Datos"
-   * @example "Autenticación"
+   * @example "Database"
    */
   title: string;
 
   /**
-   * Descripción breve del evento, estado o resultado a registrar.
+   * Descripción del evento o resultado a registrar.
    *
-   * Aparece precedido por el prefijo del nivel (ej. `[INFO]`).
-   * Para adjuntar información estructurada adicional, usar el campo `data`.
+   * Aparece precedido por el prefijo del nivel correspondiente (ej. `[SUCCESS]`, `[ERROR]`).
    *
    * @example "Aplicación iniciada en el puerto 3000"
-   * @example "Conexión exitosa con PostgreSQL"
-   * @example "Token JWT inválido o expirado"
+   * @example "No se pudo conectar a la base de datos"
    */
   message: string;
 
   /**
    * Colección de elementos estructurados a mostrar debajo del mensaje.
    *
-   * Acepta un único objeto o un array de objetos. Cada elemento se serializa
-   * automáticamente con `JSON.stringify` usando indentación de 2 espacios.
-   * Se muestra separado del mensaje principal para mantener una lectura
-   * clara y ordenada.
+   * Acepta un único objeto o un array. Cada elemento se serializa
+   * automáticamente a JSON con una indentación de 2 espacios.
    *
-   * Cuando se pasa un array, cada elemento se precede de su índice entre
-   * corchetes (ej. `[0]`, `[1]`).
-   *
-   * @example { name: "Rodrigo", age: 32 }
-   * @example [{ id: 1, status: "active" }, { id: 2, status: "inactive" }]
-   * @example ["error_1", "error_2"]
+   * @example { id: 1, status: "active" }
+   * @example ["error_code_1", "error_code_2"]
    */
   data?: unknown | unknown[];
 
   /**
    * Una URL opcional para incluir en el log.
    *
-   * Se mostrará debajo del mensaje principal y cualquier dato estructurado.
+   * Se mostrará al final del contenido del cuadro.
    *
-   * @example "http://localhost:5134"
+   * @example "https://api.example.com/v1/health"
    */
   url?: string;
 
   /**
-   * Color ANSI aplicado al borde del cuadro (encabezado y pie).
+   * Color ANSI aplicado al borde del cuadro.
    *
-   * Ambos bordes comparten siempre el mismo color para
-   * mantener una apariencia visual consistente.
-   *
-   * @default "cyan" | "red" | "yellow" | "green" (según el nivel de log)
+   * @default "cyan" | "green" | "yellow" | "red" (según el método llamado)
    */
   borderColor?: LoggerColor;
 
   /**
-   * Estilo de borde del cuadro renderizado por `boxen`.
+   * Estilo de borde del cuadro renderizado.
    *
-   * Determina los caracteres utilizados para dibujar el marco del log.
-   * Acepta cualquier estilo soportado por `boxen`.
-   *
-   * Estilos disponibles: `"single"`, `"double"`, `"round"`, `"bold"`,
-   * `"singleDouble"`, `"doubleSingle"`, `"classic"`, `"arrow"`.
+   * Estilos: `"single"`, `"double"`, `"round"`, `"bold"`, `"singleDouble"`,
+   * `"doubleSingle"`, `"classic"`, `"arrow"`.
    *
    * @default "round"
-   *
-   * @example "round"   // ╭──────╮
-   * @example "double"  // ╔══════╗
-   * @example "bold"    // ┏━━━━━━┓
    */
   borderStyle?: LoggerBorderStyle;
 
   /**
-   * Color ANSI aplicado al cuerpo del mensaje.
+   * Color ANSI aplicado al cuerpo del mensaje y datos.
    *
-   * Controla el color del texto que contiene el prefijo
-   * de nivel y el contenido del log.
-   *
-   * @default "cyan" | "red" | "yellow" | "green" (según el nivel de log)
+   * @default "cyan" | "green" | "yellow" | "red" (según el método llamado)
    */
   messageColor?: LoggerColor;
 };
@@ -135,75 +110,27 @@ type LoggerOptions = {
 /**
  * Logger visual para consola con formato de cuadro decorativo.
  *
- * Genera salidas estructuradas usando `boxen` para renderizar
- * un bloque enmarcado con título, cuerpo y borde estilizado.
- * Soporta colores ANSI, múltiples estilos de borde y serialización
- * automática de datos estructurados mediante el campo `data`.
+ * Utiliza `boxen` para renderizar bloques enmarcados con títulos, prefijos de nivel
+ * y serialización automática de datos. Ofrece métodos especializados para diferentes
+ * niveles de severidad con colores predefinidos.
  *
- * Ideal para mejorar la legibilidad de logs en aplicaciones Node.js,
- * scripts CLI y procesos backend donde distinguir contextos visualmente
- * es importante.
- *
- * ---
- *
- * ### Formato de salida — solo mensaje
- *
- * ```
- * ╭──────── Servidor ────────╮
- * │                          │
- * │   [INFO] App iniciada    │
- * │                          │
- * ╰──────────────────────────╯
- * ```
- *
- * ### Formato de salida — mensaje con data
- *
- * ```
- * ╭────────── Servidor ──────────╮
- * │                              │
- * │   [INFO] Usuarios cargados   │
- * │                              │
- * │   [0] {                      │
- * │     "name": "Rodrigo",       │
- * │     "age": 32                │
- * │   }                          │
- * │                              │
- * ╰──────────────────────────────╯
- * ```
- *
- * ---
+ * ### Niveles disponibles:
+ * - `info()`: Color celeste (cyan).
+ * - `success()`: Color verde (green).
+ * - `warn()`: Color amarillo/naranja (yellow).
+ * - `error()`: Color rojo (red).
  *
  * @example
- * // Uso básico
  * const logger = new RogerLogger();
  *
- * logger.info({
- *   title: "Servidor",
- *   message: "Aplicación iniciada",
- * });
- *
- * @example
- * // Con datos estructurados
- * const logger = new RogerLogger();
- *
- * logger.info({
- *   title: "Servidor",
- *   message: "Usuarios cargados",
- *   data: [{ name: "Rodrigo", age: 32 }],
- * });
- *
- * @example
- * // Con diferentes niveles
- * logger.success({ title: "Éxito", message: "Proceso completado" });
- * logger.error({ title: "Error", message: "Fallo de conexión" });
- * logger.warn({ title: "Aviso", message: "Uso de CPU elevado" });
+ * logger.success({ title: "DB", message: "Conexión establecida" });
+ * logger.info({ title: "App", message: "Servidor escuchando" });
+ * logger.warn({ title: "Config", message: "Falta variable de entorno" });
+ * logger.error({ title: "Auth", message: "Token expirado", data: { exp: 123456 } });
  */
 export class RogerLogger {
   /**
-   * Mapa de códigos de escape ANSI indexados por nombre de color.
-   *
-   * Usado internamente para colorear el texto del mensaje
-   * antes de pasarlo a `boxen`.
+   * Mapa de códigos de escape ANSI para colores de texto.
    */
   private colors: Record<LoggerColor, string> = {
     black: "\x1b[30m",
@@ -217,20 +144,15 @@ export class RogerLogger {
   };
 
   /**
-   * Código ANSI de reset que restaura el estilo predeterminado
-   * de la terminal al finalizar el texto coloreado.
+   * Código ANSI para resetear el color del texto.
    */
   private reset = "\x1b[0m";
 
   /**
-   * Serializa el array `data` en un bloque de texto legible.
+   * Serializa datos estructurados para su visualización.
    *
-   * Cada elemento se representa con su índice entre corchetes (ej. `[0]`)
-   * seguido de su contenido serializado con `JSON.stringify` e indentado
-   * con 2 espacios. Los elementos se separan entre sí con una línea en blanco.
-   *
-   * @param data - Array de valores a serializar.
-   * @returns Bloque de texto listo para incluir en el log.
+   * @param data - Datos a serializar (objeto o array).
+   * @returns String formateado con indentación y prefijos de índice si es array.
    */
   private serializeData(data: unknown | unknown[]): string {
     if (!Array.isArray(data)) {
@@ -243,9 +165,11 @@ export class RogerLogger {
   }
 
   /**
-   * Renderiza y muestra el log en consola utilizando `boxen`.
+   * Lógica interna para renderizar y mostrar el log.
    *
-   * Centraliza la lógica de formateo para los diferentes niveles de log.
+   * @param level - Prefijo de nivel (INFO, SUCCESS, etc).
+   * @param options - Configuración del log proporcionada por el usuario.
+   * @param defaultColor - Color predeterminado si no se especifica uno en opciones.
    */
   private print(
     level: "INFO" | "SUCCESS" | "ERROR" | "WARN",
@@ -285,36 +209,44 @@ export class RogerLogger {
   }
 
   /**
-   * Imprime un mensaje informativo (celeste por defecto).
+   * Registra un mensaje de información.
    *
-   * @param options - Configuración del log.
+   * @param options - Configuración del log. Por defecto usa color celeste (cyan).
+   * @example
+   * logger.info({ title: "System", message: "Iniciando proceso..." });
    */
   info(options: LoggerOptions): void {
     this.print("INFO", options, "cyan");
   }
 
   /**
-   * Imprime un mensaje de éxito (verde por defecto).
+   * Registra un mensaje de éxito.
    *
-   * @param options - Configuración del log.
+   * @param options - Configuración del log. Por defecto usa color verde (green).
+   * @example
+   * logger.success({ title: "Upload", message: "Archivo subido con éxito" });
    */
   success(options: LoggerOptions): void {
     this.print("SUCCESS", options, "green");
   }
 
   /**
-   * Imprime un mensaje de error (rojo por defecto).
+   * Registra un mensaje de error.
    *
-   * @param options - Configuración del log.
+   * @param options - Configuración del log. Por defecto usa color rojo (red).
+   * @example
+   * logger.error({ title: "API", message: "Error 500", data: { error: "Internal Server Error" } });
    */
   error(options: LoggerOptions): void {
     this.print("ERROR", options, "red");
   }
 
   /**
-   * Imprime un mensaje de advertencia (naranja/amarillo por defecto).
+   * Registra un mensaje de advertencia.
    *
-   * @param options - Configuración del log.
+   * @param options - Configuración del log. Por defecto usa color amarillo (yellow).
+   * @example
+   * logger.warn({ title: "Memory", message: "Uso de memoria elevado" });
    */
   warn(options: LoggerOptions): void {
     this.print("WARN", options, "yellow");
