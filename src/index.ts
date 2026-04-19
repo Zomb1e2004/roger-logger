@@ -100,7 +100,7 @@ type LoggerOptions = {
    * Ambos bordes comparten siempre el mismo color para
    * mantener una apariencia visual consistente.
    *
-   * @default "cyan"
+   * @default "cyan" | "red" | "yellow" | "green" (según el nivel de log)
    */
   borderColor?: LoggerColor;
 
@@ -127,7 +127,7 @@ type LoggerOptions = {
    * Controla el color del texto que contiene el prefijo
    * de nivel y el contenido del log.
    *
-   * @default "cyan"
+   * @default "cyan" | "red" | "yellow" | "green" (según el nivel de log)
    */
   messageColor?: LoggerColor;
 };
@@ -193,16 +193,10 @@ type LoggerOptions = {
  * });
  *
  * @example
- * // Con apariencia personalizada
- * const logger = new RogerLogger();
- *
- * logger.info({
- *   title: "Auth",
- *   message: "Token inválido",
- *   borderColor: "red",
- *   borderStyle: "double",
- *   messageColor: "yellow",
- * });
+ * // Con diferentes niveles
+ * logger.success({ title: "Éxito", message: "Proceso completado" });
+ * logger.error({ title: "Error", message: "Fallo de conexión" });
+ * logger.warn({ title: "Aviso", message: "Uso de CPU elevado" });
  */
 export class RogerLogger {
   /**
@@ -237,10 +231,6 @@ export class RogerLogger {
    *
    * @param data - Array de valores a serializar.
    * @returns Bloque de texto listo para incluir en el log.
-   *
-   * @example
-   * this.serializeData([{ name: "Rodrigo" }]);
-   * // "[0] {\n  \"name\": \"Rodrigo\"\n}"
    */
   private serializeData(data: unknown | unknown[]): string {
     if (!Array.isArray(data)) {
@@ -253,56 +243,27 @@ export class RogerLogger {
   }
 
   /**
-   * Imprime un mensaje informativo dentro de un cuadro decorativo.
+   * Renderiza y muestra el log en consola utilizando `boxen`.
    *
-   * Renderiza un bloque enmarcado con `boxen` compuesto por:
-   * 1. **Título**: centrado en el borde superior del cuadro.
-   * 2. **Mensaje**: prefijo `[INFO]` seguido de la descripción del evento.
-   * 3. **Data** *(opcional)*: cada elemento del array serializado con su índice,
-   *    mostrado debajo del mensaje y separado por una línea en blanco.
-   *
-   * El borde del cuadro (color y estilo) y el color del mensaje
-   * pueden personalizarse de forma independiente mediante {@link LoggerOptions}.
-   *
-   * @param options - Configuración del log. Ver {@link LoggerOptions}.
-   * @returns `void`. Este método produce un efecto secundario en consola.
-   *
-   * @example
-   * // Solo mensaje
-   * logger.info({
-   *   title: "Servidor",
-   *   message: "Aplicación iniciada",
-   * });
-   *
-   * @example
-   * // Con datos estructurados
-   * logger.info({
-   *   title: "Servidor",
-   *   message: "Usuarios cargados",
-   *   data: [{ name: "Rodrigo", age: 32 }, { name: "Ana", age: 28 }],
-   * });
-   *
-   * @example
-   * // Personalización completa
-   * logger.info({
-   *   title: "Auth",
-   *   message: "Token inválido",
-   *   borderColor: "red",
-   *   borderStyle: "double",
-   *   messageColor: "white",
-   * });
+   * Centraliza la lógica de formateo para los diferentes niveles de log.
    */
-  info({
-    title,
-    message,
-    data,
-    url,
-    borderColor = "cyan",
-    borderStyle = "round",
-    messageColor = "cyan",
-  }: LoggerOptions): void {
+  private print(
+    level: "INFO" | "SUCCESS" | "ERROR" | "WARN",
+    options: LoggerOptions,
+    defaultColor: LoggerColor,
+  ): void {
+    const {
+      title,
+      message,
+      data,
+      url,
+      borderColor = defaultColor,
+      borderStyle = "round",
+      messageColor = defaultColor,
+    } = options;
+
     const color = this.colors[messageColor];
-    const lines = [`${color}[INFO] ${message}${this.reset}`];
+    const lines = [`${color}[${level}] ${message}${this.reset}`];
 
     if (data !== undefined) {
       lines.push(`${color}${this.serializeData(data)}${this.reset}`);
@@ -321,5 +282,41 @@ export class RogerLogger {
         borderColor,
       }),
     );
+  }
+
+  /**
+   * Imprime un mensaje informativo (celeste por defecto).
+   *
+   * @param options - Configuración del log.
+   */
+  info(options: LoggerOptions): void {
+    this.print("INFO", options, "cyan");
+  }
+
+  /**
+   * Imprime un mensaje de éxito (verde por defecto).
+   *
+   * @param options - Configuración del log.
+   */
+  success(options: LoggerOptions): void {
+    this.print("SUCCESS", options, "green");
+  }
+
+  /**
+   * Imprime un mensaje de error (rojo por defecto).
+   *
+   * @param options - Configuración del log.
+   */
+  error(options: LoggerOptions): void {
+    this.print("ERROR", options, "red");
+  }
+
+  /**
+   * Imprime un mensaje de advertencia (naranja/amarillo por defecto).
+   *
+   * @param options - Configuración del log.
+   */
+  warn(options: LoggerOptions): void {
+    this.print("WARN", options, "yellow");
   }
 }

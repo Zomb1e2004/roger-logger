@@ -1,4 +1,4 @@
-# roger-logger
+# roger-logger v1.0.2
 
 Logger visual para consola con formato de cuadro decorativo, construido sobre [`boxen`](https://github.com/sindresorhus/boxen).
 
@@ -31,46 +31,31 @@ import { RogerLogger } from "roger-logger";
 
 const logger = new RogerLogger();
 
-// Mensaje simple
-logger.info({
-  title: "Servidor",
-  message: "Aplicación iniciada",
-});
-
-// Con un objeto en data
-logger.info({
-  title: "Servidor",
-  message: "Datos del usuario",
-  data: { name: "Rodrigo", age: 32 },
-});
-
-// Con un array de objetos en data
-logger.info({
-  title: "Base de Datos",
-  message: "Usuarios encontrados",
-  data: [
-    { name: "Rodrigo", age: 32 },
-    { name: "Ana", age: 28 },
-  ],
-});
-
-// Con apariencia personalizada
-logger.info({
+// Éxito (Verde por defecto)
+logger.success({
   title: "Auth",
-  message: "Token inválido",
-  borderColor: "red",
-  borderStyle: "double",
-  messageColor: "yellow",
+  message: "Usuario autenticado correctamente",
+  data: { userId: "123" }
 });
 
-// Con una URL
+// Información (Celeste por defecto)
 logger.info({
-  title: "Servidor API",
-  message: "Endpoint de usuarios",
-  url: "https://api.ejemplo.com/v1/users",
-  borderColor: "magenta",
-  borderStyle: "bold",
-  messageColor: "magenta",
+  title: "Servidor",
+  message: "Aplicación iniciada en el puerto 3000",
+});
+
+// Advertencia (Amarillo/Naranja por defecto)
+logger.warn({
+  title: "Performance",
+  message: "La consulta tardó más de lo esperado",
+  data: { duration: "850ms" }
+});
+
+// Error (Rojo por defecto)
+logger.error({
+  title: "Base de Datos",
+  message: "No se pudo establecer conexión",
+  data: { host: "localhost", port: 5432 }
 });
 ```
 
@@ -84,21 +69,26 @@ Crea una nueva instancia del logger. No requiere configuración inicial.
 
 ---
 
-### `logger.info(options: LoggerOptions): void`
+### Métodos de Log
 
-Imprime un mensaje informativo dentro de un cuadro decorativo.
+Todos los métodos aceptan un objeto `LoggerOptions` y funcionan de la misma manera, variando únicamente su color y prefijo por defecto.
+
+- `logger.success(options)`: Prefijo `[SUCCESS]`, color verde.
+- `logger.info(options)`: Prefijo `[INFO]`, color celeste.
+- `logger.warn(options)`: Prefijo `[WARN]`, color amarillo.
+- `logger.error(options)`: Prefijo `[ERROR]`, color rojo.
 
 #### `LoggerOptions`
 
 | Campo         | Tipo                  | Requerido | Default    | Descripción                                                                 |
 |---------------|-----------------------|-----------|------------|-----------------------------------------------------------------------------|
 | `title`       | `string`              | ✅        | —          | Título del cuadro, centrado en el borde superior.                           |
-| `message`     | `string`              | ✅        | —          | Descripción breve del evento. Aparece con el prefijo `[INFO]`.              |
-| `data`        | `unknown \| unknown[]`| ❌        | —          | Objeto o array de objetos a mostrar debajo del mensaje. Se serializa automáticamente. |
-| `url`         | `string`              | ❌        | —          | Una URL opcional para incluir en el log, mostrada debajo del mensaje y los datos. |
-| `borderColor` | `LoggerColor`         | ❌        | `"cyan"`   | Color del borde del cuadro (encabezado y pie comparten el mismo color).     |
-| `borderStyle` | `LoggerBorderStyle`   | ❌        | `"round"`  | Estilo de borde del cuadro. Ver estilos disponibles abajo.                  |
-| `messageColor`| `LoggerColor`         | ❌        | `"cyan"`   | Color del texto del mensaje.                                                |
+| `message`     | `string`              | ✅        | —          | Descripción del evento. Aparece con el prefijo correspondiente.             |
+| `data`        | `unknown \| unknown[]`| ❌        | —          | Objeto o array a mostrar debajo del mensaje. Serializado automáticamente.   |
+| `url`         | `string`              | ❌        | —          | URL opcional para incluir en el log.                                        |
+| `borderColor` | `LoggerColor`         | ❌        | *Dinámico* | Color del borde (según el nivel).                                           |
+| `borderStyle` | `LoggerBorderStyle`   | ❌        | `"round"`  | Estilo de borde del cuadro.                                                 |
+| `messageColor`| `LoggerColor`         | ❌        | *Dinámico* | Color del texto del mensaje (según el nivel).                               |
 
 ---
 
@@ -147,15 +137,6 @@ Cuando se pasa un array, cada elemento se muestra precedido de su índice entre 
 [1] {
   "name": "Ana",
   "age": 28
-}
-```
-
-Cuando se pasa un objeto único, se muestra directamente sin índice:
-
-```
-{
-  "name": "Rodrigo",
-  "age": 32
 }
 ```
 
